@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder(toBuilder = true)
 @EqualsAndHashCode(of = {"itemId", "color"})
-public class CartItem
+public class OrderItem
 {
     private UUID itemId;
     private String color;

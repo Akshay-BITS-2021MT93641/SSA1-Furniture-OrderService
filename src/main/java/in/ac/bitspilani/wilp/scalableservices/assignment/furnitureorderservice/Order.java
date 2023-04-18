@@ -1,11 +1,8 @@
 package in.ac.bitspilani.wilp.scalableservices.assignment.furnitureorderservice;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.data.annotation.Id;
@@ -21,18 +18,19 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder(toBuilder = true)
 @Document
-public class Cart
+public class Order
 {
     @Id
     @Builder.Default
-    private UUID cartId = UUID.randomUUID();
-    private String clientHostAddress;
+    private UUID orderId = UUID.randomUUID();
     @Builder.Default
-    private List<OrderItem> cartItems = new ArrayList<>(1);
+    private List<OrderItem> orderItems = new ArrayList<>(1);
+    private String customerName;
+    private String customerContact;
+    private String billingAdress;
+    private String shippingAdress;
+    private PaymentMethod paymentMethod;
+    private PaymentStatus paymentStatus;
+    private DeliveryStatus deliveryStatus;
     private LocalDateTime lastUpdateTimestampUtc;
-    
-    public BigDecimal getCartTotalCost() 
-    {
-        return Optional.ofNullable(cartItems).orElse(Collections.emptyList()).stream().map(OrderItem::getItemTotalCost).reduce(BigDecimal.ZERO, BigDecimal::add);
-    }
 }
