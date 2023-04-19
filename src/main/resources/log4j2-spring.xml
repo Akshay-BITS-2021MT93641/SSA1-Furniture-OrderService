@@ -14,6 +14,7 @@
         </Root>
 
         <Logger name="in.ac.bitspilani.wilp.scalableservices.assignment" level="debug"/>
+        <Logger name="org.springframework.data.mongodb.core.ReactiveMongoTemplate" level="debug"/>
     </Loggers>
 
 </Configuration>
