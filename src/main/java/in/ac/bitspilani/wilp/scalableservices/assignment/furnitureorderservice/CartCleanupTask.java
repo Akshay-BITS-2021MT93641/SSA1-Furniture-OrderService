@@ -2,7 +2,6 @@ package in.ac.bitspilani.wilp.scalableservices.assignment.furnitureorderservice;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.concurrent.TimeUnit;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.ReactiveMongoOperations;
@@ -20,7 +19,7 @@ public class CartCleanupTask
     @Autowired
     private ReactiveMongoOperations reactiveMongoOperations;
     
-    @Scheduled(fixedRate = 1, timeUnit = TimeUnit.MINUTES)
+    @Scheduled(cron ="0 0 0 ? * ?")
     public void cleanupOldCarts() {
         
         LocalDateTime utc24hrsAgo = LocalDateTime.now(ZoneOffset.UTC).minusHours(24);

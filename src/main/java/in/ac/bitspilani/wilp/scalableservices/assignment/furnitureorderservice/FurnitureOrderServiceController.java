@@ -35,7 +35,7 @@ public class FurnitureOrderServiceController
     @Autowired
     private FurnitureCatalogDao furnitureCatalogDao;
     
-    @PutMapping("/upsertCart")
+    @PostMapping("/cart")
     public Mono<Cart> upsertCart(@RequestBody OrderItem[] cartItemsUpsert, ServerHttpRequest request) 
     {
         Objects.requireNonNull(cartItemsUpsert);
@@ -46,7 +46,7 @@ public class FurnitureOrderServiceController
                 .flatMap(cart->{
                     return
                         Flux.fromArray(cartItemsUpsert)
-                        .filterWhen(cartItemToAdd->furnitureCatalogDao.getCatalogItemWithStock(cartItemToAdd.getItemId())
+                        .filterWhen(cartItemToAdd->furnitureCatalogDao.getCatalogItem(cartItemToAdd.getItemId())
                                                                 .doOnSuccess(sr->cartItemToAdd.setPricePerUnit(sr.getCatalogItem().getPrice()))
                                                                 .filter(sr->{
                                                                     Integer stock = Optional.ofNullable(sr.getColorWiseStock()).orElse(Collections.emptyMap()).get(cartItemToAdd.getColor());
@@ -68,7 +68,7 @@ public class FurnitureOrderServiceController
                 });
     }
     
-    @PutMapping("/createOrder")
+    @PutMapping("/order")
     public Mono<Order> createOrder(@RequestBody Order order)
     {
         return
@@ -82,7 +82,7 @@ public class FurnitureOrderServiceController
                     
                     return
                             Flux.fromIterable(order.getOrderItems())
-                            .filterWhen(cartItemToAdd->furnitureCatalogDao.getCatalogItemWithStock(cartItemToAdd.getItemId())
+                            .filterWhen(cartItemToAdd->furnitureCatalogDao.getCatalogItem(cartItemToAdd.getItemId())
                                                                     .doOnSuccess(sr->cartItemToAdd.setPricePerUnit(sr.getCatalogItem().getPrice()))
                                                                     .filter(sr->{
                                                                         Integer stock = Optional.ofNullable(sr.getColorWiseStock()).orElse(Collections.emptyMap()).get(cartItemToAdd.getColor());
@@ -104,11 +104,11 @@ public class FurnitureOrderServiceController
                 });
     }
     
-    @PostMapping("/updateOrder")
-    public Mono<Order> updateOrder(@RequestBody Order order)
+    @PostMapping("/order/{orderId}")
+    public Mono<Order> updateOrder(@PathVariable UUID orderId, @RequestBody Order order)
     {
         return
-                orderRepository.findById(order.getOrderId())
+                orderRepository.findById(orderId)
                 .hasElement()
                 .flatMap(exist->{
                     
@@ -118,7 +118,7 @@ public class FurnitureOrderServiceController
                     
                     return
                             Flux.fromIterable(order.getOrderItems())
-                            .filterWhen(cartItemToAdd->furnitureCatalogDao.getCatalogItemWithStock(cartItemToAdd.getItemId())
+                            .filterWhen(cartItemToAdd->furnitureCatalogDao.getCatalogItem(cartItemToAdd.getItemId())
                                                                     .doOnSuccess(sr->cartItemToAdd.setPricePerUnit(sr.getCatalogItem().getPrice()))
                                                                     .filter(sr->{
                                                                         Integer stock = Optional.ofNullable(sr.getColorWiseStock()).orElse(Collections.emptyMap()).get(cartItemToAdd.getColor());
@@ -133,6 +133,7 @@ public class FurnitureOrderServiceController
                                     return Mono.error(new IllegalArgumentException("No valid items or stock not sufficient for some items")); 
                                 }
                                 
+                                order.setOrderId(orderId);
                                 order.setOrderItems(cartItems);
                                 order.setLastUpdateTimestampUtc(LocalDateTime.now(ZoneOffset.UTC));
                                 return orderRepository.save(order);
@@ -140,7 +141,7 @@ public class FurnitureOrderServiceController
                 });
     }
     
-    @PostMapping("/updateOrderPaymentStatus/{orderId}")
+    @PostMapping("/order/paymentStatus/{orderId}")
     public Mono<Order> updateOrderPaymentStatus(@PathVariable UUID orderId, @RequestParam PaymentStatus paymentStatus)
     {
         return
@@ -157,7 +158,7 @@ public class FurnitureOrderServiceController
                 });
     }
     
-    @PostMapping("/updateOrderDeliveryStatus/{orderId}")
+    @PostMapping("/order/deliveryStatus/{orderId}")
     public Mono<Order> updateOrderDeliveryStatus(@PathVariable UUID orderId, @RequestParam DeliveryStatus deliveryStatus)
     {
         return

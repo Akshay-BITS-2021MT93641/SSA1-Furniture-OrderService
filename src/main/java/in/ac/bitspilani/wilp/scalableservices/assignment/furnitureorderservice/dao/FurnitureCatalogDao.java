@@ -13,10 +13,10 @@ import reactor.core.publisher.Mono;
 public class FurnitureCatalogDao
 {
 
-    @Value("${ssa1.furniture.catalog.getCatalogItemWithStockUrl}")
+    @Value("${ssa1.furniture.catalog.getCatalogItemUrl}")
     private String getCatalogItemWithStockUrl;
     
-    public Mono<CatalogItemSearchResult> getCatalogItemWithStock(UUID catalogItemId)
+    public Mono<CatalogItemSearchResult> getCatalogItem(UUID catalogItemId)
     {
         return
                 WebClient.builder()
